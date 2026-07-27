@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FHE Liar's Dice - Game Overview</title>
+  <meta name="description" content="Overview page for a Fhenix CoFHE privacy game targeting Arbitrum Sepolia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Open+Sans:wght@400;500;600;700&family=Urbanist:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* tastemaker · macrostructure: Product Demo / Workbench · mood: playful-dark · page: overview
+     * arc: hook(H2) -> problem(prose+table-risk) -> solution(F3) -> how(F4) -> proof(F6) -> close(C2)
+     * nav: N6 · hero: H2 · footer: Ft2 · knobs: hero=split-demo/left-bias/encrypted-table
+     * palette: seed 27 (playful/dark) · contrast: pass (matrix)
+     * critique: ShowTell 5 · Phil 4 · Hier 5 · Spec 5 · Restr 4 · Var 5 */
+    :root {
+      --bg: #070a0f;
+      --surface: #11151a;
+      --surface-2: #162f4a;
+      --text: #e9f3fe;
+      --muted: #9aa8b7;
+      --primary: #0675d3;
+      --accent: #f2753f;
+      --border: #1c2026;
+      --on-primary: #ffffff;
+      --line: rgba(233, 243, 254, 0.13);
+      --max: 1180px;
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        linear-gradient(90deg, rgba(233, 243, 254, 0.035) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(233, 243, 254, 0.025) 1px, transparent 1px),
+        var(--bg);
+      background-size: 48px 48px;
+      font-family: "Open Sans", system-ui, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      overflow: hidden;
+    }
+
+    .shell {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(7, 10, 15, 0.84);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: "Urbanist", sans-serif;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--primary);
+      background: #0b111b;
+      border-radius: 7px;
+    }
+
+    .mark svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .command {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: min(420px, 46vw);
+      padding: 10px 12px;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: rgba(17, 21, 26, 0.9);
+      border-radius: var(--radius);
+      font-size: 13px;
+    }
+
+    .kbd {
+      margin-left: auto;
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--text);
+      padding: 2px 7px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #070a0f;
+    }
+
+    .navlinks {
+      display: flex;
+      justify-content: flex-end;
+      gap: 18px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hero {
+      min-height: calc(100vh - 72px);
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(380px, 1.12fr);
+      align-items: center;
+      gap: 56px;
+      padding: 96px 0 128px;
+    }
+
+    .eyebrow,
+    .mono {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: "Urbanist", sans-serif;
+      line-height: 1.02;
+      letter-spacing: 0;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(3.1rem, 8vw, 6.6rem);
+      max-width: 760px;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      max-width: 780px;
+    }
+
+    h3 {
+      font-size: 1.35rem;
+    }
+
+    .lede {
+      margin: 24px 0 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.7vw, 1.2rem);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+    }
+
+    .button.primary {
+      color: var(--on-primary);
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .button.secondary {
+      color: var(--text);
+      background: rgba(17, 21, 26, 0.9);
+    }
+
+    .table-visual {
+      position: relative;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 50% 50%, rgba(6, 117, 211, 0.22), transparent 42%),
+        #0b0f15;
+    }
+
+    .concept-frame {
+      position: relative;
+      overflow: hidden;
+      min-height: 450px;
+      border: 1px solid rgba(6, 117, 211, 0.35);
+      border-radius: var(--radius);
+      background: #0d141d;
+    }
+
+    .concept-frame img {
+      width: 100%;
+      height: 100%;
+      min-height: 450px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .concept-note {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      max-width: 260px;
+      padding: 14px;
+      border: 1px solid rgba(233, 243, 254, 0.16);
+      border-radius: 6px;
+      background: rgba(7, 10, 15, 0.78);
+      backdrop-filter: blur(10px);
+    }
+
+    .concept-note p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .felt {
+      position: relative;
+      min-height: 450px;
+      border: 1px solid rgba(6, 117, 211, 0.35);
+      background: #0d141d;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .felt:before,
+    .felt:after {
+      content: "";
+      position: absolute;
+      inset: 38px;
+      border: 1px dashed rgba(233, 243, 254, 0.16);
+      border-radius: 50%;
+    }
+
+    .felt:after {
+      inset: 88px;
+      border-color: rgba(242, 117, 63, 0.24);
+    }
+
+    .center-verdict {
+      position: relative;
+      z-index: 2;
+      width: min(280px, 70%);
+      padding: 22px;
+      border: 1px solid rgba(242, 117, 63, 0.55);
+      border-radius: var(--radius);
+      background: #070a0f;
+      text-align: center;
+    }
+
+    .center-verdict strong {
+      display: block;
+      font-family: "Urbanist", sans-serif;
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--accent);
+      margin-top: 6px;
+    }
+
+    .hand {
+      position: absolute;
+      z-index: 3;
+      width: 122px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(17, 21, 26, 0.92);
+    }
+
+    .hand:nth-child(2) { top: 28px; left: 28px; }
+    .hand:nth-child(3) { top: 28px; right: 28px; }
+    .hand:nth-child(4) { bottom: 28px; left: 28px; }
+    .hand:nth-child(5) { bottom: 28px; right: 28px; }
+
+    .player {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+
+    .dice-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+
+    .die {
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(6, 117, 211, 0.6);
+      border-radius: 4px;
+      background: #0a1119;
+      color: var(--primary);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+    }
+
+    .bid-ribbon {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: -20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .bid {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11151a;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+    }
+
+    section {
+      padding: 96px 0;
+      border-top: 1px solid rgba(233, 243, 254, 0.08);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 44px;
+      align-items: end;
+      margin-bottom: 44px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      margin: 0;
+      max-width: 620px;
+    }
+
+    .risk-board {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .panel,
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(17, 21, 26, 0.86);
+    }
+
+    .panel {
+      padding: 28px;
+    }
+
+    .public-table {
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 88px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b0f15;
+    }
+
+    .row strong {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+    }
+
+    .seal {
+      color: var(--accent);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .sticky {
+      position: sticky;
+      top: 110px;
+    }
+
+    .pipeline {
+      display: grid;
+      gap: 12px;
+    }
+
+    .pipe-step {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b0f15;
+    }
+
+    .num {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 4px;
+      color: var(--on-primary);
+      background: var(--primary);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pipe-step p,
+    .card p,
+    .panel p {
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    .architecture {
+      display: grid;
+      gap: 14px;
+    }
+
+    .arch-node {
+      position: relative;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b0f15;
+    }
+
+    .arch-node + .arch-node:before {
+      content: "";
+      position: absolute;
+      top: -15px;
+      left: 28px;
+      width: 1px;
+      height: 14px;
+      background: var(--primary);
+    }
+
+    .grid-3,
+    .grid-4,
+    .grid-2 {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      padding: 24px;
+    }
+
+    .card .mono,
+    .panel .mono {
+      color: var(--accent);
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .mode-tab {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--muted);
+      background: #0b0f15;
+      min-height: 40px;
+      padding: 0 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-tab.active {
+      color: var(--on-primary);
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .mode-panel {
+      display: none;
+    }
+
+    .mode-panel.active {
+      display: grid;
+    }
+
+    .spec-table {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #0b0f15;
+    }
+
+    .spec-row {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 18px;
+      padding: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .spec-row:first-child {
+      border-top: 0;
+    }
+
+    .spec-row strong {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .spec-row span {
+      color: var(--muted);
+    }
+
+    .callout {
+      padding: 40px;
+      border: 1px solid rgba(242, 117, 63, 0.48);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(242, 117, 63, 0.13), transparent 32%),
+        #0b0f15;
+    }
+
+    .callout p {
+      max-width: 760px;
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 28px 0 44px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 920px) {
+      .nav {
+        grid-template-columns: 1fr;
+      }
+
+      .command,
+      .navlinks {
+        display: none;
+      }
+
+      .hero,
+      .section-head,
+      .risk-board,
+      .flow,
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 64px 0 96px;
+      }
+
+      .sticky {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 24px, var(--max));
+      }
+
+      h1 {
+        font-size: clamp(2.7rem, 16vw, 4.2rem);
+      }
+
+      section {
+        padding: 64px 0;
+      }
+
+      .table-visual,
+      .panel,
+      .card,
+      .callout {
+        padding: 18px;
+      }
+
+      .concept-frame,
+      .concept-frame img {
+        min-height: 360px;
+      }
+
+      .felt {
+        min-height: 560px;
+      }
+
+      .hand {
+        width: 104px;
+      }
+
+      .bid-ribbon {
+        position: static;
+        grid-template-columns: 1fr;
+        margin-top: 14px;
+      }
+
+      .spec-row,
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *:before, *:after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <nav class="shell nav" aria-label="Primary">
+        <a href="#top" class="brand">
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="4" width="16" height="16" rx="3" stroke="#0675d3" stroke-width="1.7"/>
+              <circle cx="9" cy="9" r="1.4" fill="#f2753f"/>
+              <circle cx="15" cy="15" r="1.4" fill="#f2753f"/>
+              <path d="M8 15h8" stroke="#e9f3fe" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </span>
+          FHE Liar's Dice
+        </a>
+        <div class="command" aria-label="Overview navigation">
+          <span class="mono">overview</span>
+          <span>encrypted hands, public bids, private verdicts</span>
+          <span class="kbd">CoFHE</span>
+        </div>
+        <div class="navlinks">
+          <a href="#gameplay">Gameplay</a>
+          <a href="#modes">Modes</a>
+          <a href="#architecture">Architecture</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="shell hero">
+        <div data-reveal>
+          <div class="eyebrow">Fhenix CoFHE privacy game - Arbitrum Sepolia target</div>
+          <h1>Liar's Dice with sealed hands.</h1>
+          <p class="lede">A multiplayer bluffing game where dice rolls live as encrypted onchain state, bids escalate in public, and the contract reveals only whether the final call was true or false.</p>
+          <div class="actions">
+            <a class="button primary" href="#gameplay">Review gameplay</a>
+            <a class="button secondary" href="#architecture">Inspect stack</a>
+          </div>
+        </div>
+
+        <figure class="table-visual" aria-label="3D encrypted dice cup art direction" data-reveal>
+          <div class="concept-frame">
+            <img src="assets/images/hero-cup-concept.png" alt="A realistic 3D dice cup hiding encrypted dice on a dark table">
+            <figcaption class="concept-note">
+              <span class="mono">3d target feel</span>
+              <p>Shake the cup, place it upside down, then reveal only your own dice while everyone else's hands stay sealed.</p>
+            </figcaption>
+          </div>
+          <div class="bid-ribbon" data-reveal-group>
+            <div class="bid">ones count wild</div>
+            <div class="bid">P3 raises 8 x fours</div>
+            <div class="bid">P1 calls lie</div>
+          </div>
+        </figure>
+      </section>
+
+      <section id="problem">
+        <div class="shell">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Why this exists</div>
+              <h2>Normal onchain games leak the table.</h2>
+            </div>
+            <p>Most blockchain games either reveal state too early or move the real game offchain. Liar's Dice needs hidden hands, public social pressure, and a final aggregate truth check. That is exactly the privacy shape CoFHE is meant to show.</p>
+          </div>
+          <div class="risk-board">
+            <div class="panel">
+              <div class="public-table" data-reveal-group>
+                <div class="row"><strong>Plain RNG</strong><span>Rolls become observable once written or later reconstructable from weak entropy.</span><span class="seal">leaks</span></div>
+                <div class="row"><strong>Server host</strong><span>Fast gameplay, but players must trust an operator not to peek or reorder.</span><span class="seal">trust</span></div>
+                <div class="row"><strong>CoFHE table</strong><span>Encrypted state is computable without exposing player hands.</span><span class="seal">sealed</span></div>
+              </div>
+            </div>
+            <div class="panel">
+              <span class="mono">privacy thesis</span>
+              <h3>The table can settle a lie without learning the dice.</h3>
+              <p>The contract only needs an aggregate predicate: count dice matching the challenged face plus wild ones, compare to the bid quantity, then reveal the boolean verdict. Individual dice are not public game data until elimination.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="gameplay">
+        <div class="shell flow">
+          <div class="sticky">
+            <div class="eyebrow">Gameplay loop</div>
+            <h2>Public bluffing over private state.</h2>
+            <p class="lede">Each turn creates tension because every bid is visible, every hand is sealed, and the only public truth arrives when someone challenges.</p>
+          </div>
+          <div class="pipeline" data-reveal-group>
+            <div class="pipe-step">
+              <span class="num">01</span>
+              <div><h3>Join casual table</h3><p>Two or more players join a room with fixed casual settings: five dice per player, ones are wild, no wager logic, and no turn timers for the first build.</p></div>
+            </div>
+            <div class="pipe-step">
+              <span class="num">02</span>
+              <div><h3>Generate encrypted rolls</h3><p>Use CoFHE encrypted randomness on the contract path. Each roll maps into a sealed die face, then the UI decrypts only the local player's hand permission.</p></div>
+            </div>
+            <div class="pipe-step">
+              <span class="num">03</span>
+              <div><h3>Escalate bids</h3><p>A bid is public: quantity plus face. Ones count as wild for any challenged face, so bluffing has the classic Liar's Dice pressure.</p></div>
+            </div>
+            <div class="pipe-step">
+              <span class="num">04</span>
+              <div><h3>Call the bluff</h3><p>The contract computes encrypted matches across all sealed hands, including wild ones, and decrypts only the comparison result: bid good or bid was a lie.</p></div>
+            </div>
+            <div class="pipe-step">
+              <span class="num">05</span>
+              <div><h3>Eliminate and reveal</h3><p>For casual MVP, the losing player is eliminated by the table rule we implement first. Once elimination happens, all hands can reveal for clarity, replay, and end-of-round trust.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pages">
+        <div class="shell">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Product pages</div>
+              <h2>The screens we should build first.</h2>
+            </div>
+            <p>This is the initial surface map for the actual game app. It keeps the hackable demo small while leaving room for tournaments and spectators later.</p>
+          </div>
+          <div class="grid-4" data-reveal-group>
+            <article class="card"><span class="mono">/</span><h3>Landing</h3><p>Sharp promise, live table visual, Fhenix privacy explanation, network status, and launch CTA.</p></article>
+            <article class="card"><span class="mono">/lobby</span><h3>Lobby</h3><p>Create room, join code, table settings, wallet state, Arbitrum Sepolia readiness.</p></article>
+            <article class="card"><span class="mono">/table/:id</span><h3>3D game table</h3><p>Three.js cup shake, upside-down placement, local dice peek, current bid ladder, challenge action, and verdict history.</p></article>
+            <article class="card"><span class="mono">/rules</span><h3>Rules and privacy</h3><p>Readable mode rules plus a technical note on what CoFHE hides and what metadata remains public.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="modes">
+        <div class="shell">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Modes</div>
+              <h2>Casual mode is the build target.</h2>
+            </div>
+            <p>We are intentionally avoiding wager logic, timers, penalties, and tournaments until the core privacy game feels good.</p>
+          </div>
+          <div class="panel mode-panel active" id="mode-casual" data-reveal>
+            <div class="grid-3">
+              <article><span class="mono">players</span><h3>2+ seats</h3><p>Start with casual rooms for two or more players. Keep joining, seating, bidding, and challenge resolution obvious.</p></article>
+              <article><span class="mono">rule</span><h3>Ones are wild</h3><p>A die showing one counts toward the challenged face. The encrypted match predicate checks face equality or wild one.</p></article>
+              <article><span class="mono">feel</span><h3>Cup-first 3D</h3><p>The primary interaction should feel like shaking a physical cup, planting it upside down, and privately peeking under it.</p></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="stack">
+        <div class="shell">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Stack</div>
+              <h2>Built like a privacy game, not a normal casino app.</h2>
+            </div>
+            <p>The technical stack should make encrypted state the centerpiece while keeping the first demo practical and deployable.</p>
+          </div>
+          <div class="spec-table" data-reveal>
+            <div class="spec-row"><strong>Contracts</strong><span>Solidity, Foundry, `@fhenixprotocol/cofhe-contracts/FHE.sol`, encrypted integer and boolean operations for dice counts and verdict checks.</span></div>
+            <div class="spec-row"><strong>Network</strong><span>Arbitrum Sepolia for all contracts, room actions, challenge settlement, and event indexing.</span></div>
+            <div class="spec-row"><strong>Game engine</strong><span>Three.js for the 3D table, cup, dice, camera, and lighting; Rapier 3D for cup shake and dice tumble physics; GSAP for UI transitions outside the canvas.</span></div>
+            <div class="spec-row"><strong>Frontend</strong><span>Vite React or Next.js, wagmi/viem, RainbowKit or ConnectKit, `@cofhe/sdk` and `@cofhe/react` for encrypted inputs and permitted decryptions.</span></div>
+            <div class="spec-row"><strong>State and index</strong><span>Onchain events for canonical room history; lightweight offchain indexer for lobby discovery and replay-friendly bid history. No timer system in the casual MVP.</span></div>
+            <div class="spec-row"><strong>Randomness</strong><span>Use Fhenix CoFHE encrypted randomness, such as `FHE.randomEuint8()`, then map into die faces while keeping raw rolls sealed.</span></div>
+            <div class="spec-row"><strong>Assets</strong><span>Image-gen concept art for art direction, then production-ready 3D assets: dice meshes, cup mesh, felt table material, sealed opponent silhouettes, and encrypted glow shaders.</span></div>
+            <div class="spec-row"><strong>Testing</strong><span>Foundry unit tests for wild-one matching and verdict resolution, deterministic game-engine smoke tests, browser screenshots, and manual table-play verification with multiple wallets.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="architecture">
+        <div class="shell flow">
+          <div class="sticky">
+            <div class="eyebrow">Architecture</div>
+            <h2>Only the predicate becomes public.</h2>
+            <p class="lede">The system keeps plaintext dice out of the public path. Public chain state is useful for coordination and settlement; CoFHE handles encrypted computation.</p>
+          </div>
+          <div class="architecture" data-reveal-group>
+            <div class="arch-node"><span class="mono">browser</span><h3>Player wallet and 3D client</h3><p>Signs table actions, runs the Three.js cup/dice scene, displays own private hand when permitted, and never receives other players' plaintext rolls before elimination.</p></div>
+            <div class="arch-node"><span class="mono">arbitrum sepolia</span><h3>GameTable contract</h3><p>Stores room state, turn order, public bids, encrypted hand handles, challenge requests, and resolution events.</p></div>
+            <div class="arch-node"><span class="mono">cofhe</span><h3>Encrypted computation</h3><p>Generates sealed dice, counts challenged-face matches plus wild ones, and compares the encrypted total against the public bid quantity.</p></div>
+            <div class="arch-node"><span class="mono">threshold decrypt</span><h3>Verdict and elimination reveal</h3><p>During play, only the boolean challenge verdict is revealed. After elimination, all hands can reveal for a clean casual-game resolution.</p></div>
+            <div class="arch-node"><span class="mono">indexer</span><h3>Lobby and replay layer</h3><p>Reads public events for room lists, bid timelines, player status, and demo replays without indexing secret dice values.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="decisions">
+        <div class="shell">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">Finalize next</div>
+              <h2>The important choices are now locked.</h2>
+            </div>
+            <p>The remaining work is implementation detail, not product ambiguity: build the casual privacy loop first, then expand later.</p>
+          </div>
+          <div class="grid-2" data-reveal-group>
+            <article class="card"><span class="mono">rules</span><h3>Ones are wild</h3><p>The bid check counts dice equal to the challenged face plus dice showing one. This is locked for the casual MVP.</p></article>
+            <article class="card"><span class="mono">entropy</span><h3>CoFHE random rolls</h3><p>Use encrypted random values from Fhenix, keep roll handles sealed, and decrypt only the local hand plus final elimination reveal.</p></article>
+            <article class="card"><span class="mono">reveals</span><h3>All hands after elimination</h3><p>Hands remain sealed during active play. Once elimination resolves, reveal all hands so the table gets a satisfying end-state.</p></article>
+            <article class="card"><span class="mono">scope</span><h3>No timers or penalties yet</h3><p>Casual mode should feel smooth before we add ranked pressure, wagers, slashing, or tournament constraints.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section id="next">
+        <div class="shell">
+          <div class="callout" data-reveal>
+            <div class="eyebrow">Build path</div>
+            <h2>Start with one casual 3D table on Arbitrum Sepolia.</h2>
+            <p>Recommended MVP: two or more players, five dice each, ones as wild faces, physical cup-shake interaction, public bid ladder, encrypted aggregate resolution, and all-hand reveal after elimination.</p>
+            <div class="actions">
+              <a class="button primary" href="#stack">Use this stack</a>
+              <a class="button secondary" href="#decisions">Review open decisions</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="shell footer-line">
+        <span>FHE Liar's Dice overview - planning draft</span>
+        <span>Contracts target: Arbitrum Sepolia - Fhenix CoFHE</span>
+      </div>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script>
+    const tabs = document.querySelectorAll(".mode-tab");
+    const panels = document.querySelectorAll(".mode-panel");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.mode;
+        tabs.forEach((item) => item.classList.toggle("active", item === tab));
+        panels.forEach((panel) => {
+          const active = panel.id === `mode-${target}`;
+          panel.classList.toggle("active", active);
+          if (active && window.gsap) {
+            gsap.fromTo(panel, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" });
+          }
+        });
+      });
+    });
+
+    if (window.gsap && window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.fromTo("[data-reveal]", { y: 16 }, {
+          y: 0,
+          duration: 0.22,
+          ease: "power2.out",
+          stagger: 0.06,
+          scrollTrigger: { trigger: "body", start: "top 90%" }
+        });
+
+        document.querySelectorAll("[data-reveal-group]").forEach((group) => {
+          gsap.fromTo(Array.from(group.children), { y: 16 }, {
+            y: 0,
+            duration: 0.22,
+            ease: "power2.out",
+            stagger: 0.06,
+            scrollTrigger: { trigger: group, start: "top 82%" }
+          });
+        });
+
+        gsap.fromTo(".table-visual", { rotate: -1.5, y: 18 }, { rotate: 0, y: 0, duration: 0.5, ease: "power2.out" });
+        gsap.to(".concept-note", { y: -6, duration: 2.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
+      });
+    }
+  </script>
+</body>
+</html>

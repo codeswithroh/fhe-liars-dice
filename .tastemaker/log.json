@@ -1,0 +1,12 @@
+[
+  {
+    "date": "2026-07-27",
+    "page": "overview",
+    "macrostructure": "Product Demo / Workbench",
+    "nav": "N6",
+    "hero": "H2",
+    "footer": "Ft2",
+    "knobs": "hero=split-demo/left-bias/encrypted-table; features=F3-sticky-flow+F6-spec-sheet; cta=C2",
+    "brief": "FHE Liar's Dice for Fhenix CoFHE on Arbitrum Sepolia"
+  }
+]
