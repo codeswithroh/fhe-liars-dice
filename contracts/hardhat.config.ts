@@ -10,6 +10,8 @@ const config: HardhatUserConfig = {
     settings: { optimizer: { enabled: true, runs: 200 }, evmVersion: "cancun", viaIR: true },
   },
   cofhe: { gasSummary: false },
+  sourcify: { enabled: true },
+  etherscan: { apiKey: process.env.ETHERSCAN_API_KEY ?? "" },
 };
 
 export default config;
