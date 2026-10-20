@@ -1,13 +1,15 @@
 {
-  "LiarsDice": "0xd24ED945Cf9DD0fb0F5499f61d39021823Cf5BF6",
+  "FheLiarsDice": "0x645761Fd1b8fB752f7Bc7C0AB16b5Da3305b8F76",
   "version": "1.0.1",
   "chainId": 421614,
-  "txHash": "0xa253434173bb8ed504b3d0ada010f9c7ad3477c3e21c2485388b7d93fc042348",
+  "txHash": "0x5252c0847a3eb81cd92f3f8fbba53830a37d1599005f1099901e77438b994222",
+  "blockNumber": 321163293,
   "deployer": "0x3E02275Cf6b990BC83Fff8d2E7796bC70056acA2",
+  "legacy": "0x20B850b6ddCF9dC4E6cf6a403B27d962B3B9F9Da",
   "cofhe": {
     "sdk": "1.0.1",
     "hardhatPlugin": "1.0.1",
     "contracts": "1.0.1"
   },
-  "deployedAt": "2026-10-20T18:02:25.953Z"
+  "deployedAt": "2026-10-20T19:59:32.495Z"
 }

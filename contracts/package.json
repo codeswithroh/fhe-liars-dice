@@ -6,7 +6,8 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy:arb-sepolia": "hardhat run scripts/deploy.ts --network arb-sepolia",
-    "smoke:arb-sepolia": "hardhat run scripts/smoke.ts --network arb-sepolia"
+    "smoke:arb-sepolia": "hardhat run scripts/smoke.ts --network arb-sepolia",
+    "sync-legacy:arb-sepolia": "hardhat run scripts/sync-legacy.ts --network arb-sepolia"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* Palette locked in .tastemaker/style-lock.md — cyan + white are the fixed Fhenix brand
+   anchors, everything else (neutrals, warning/success) generated fresh for a technical
+   dark-mode product and verified against the contrast contract there. */
+:root {
+  --background: #070a0f;
+  --surface: #11151a;
+  --foreground: #eaf3fe;
+  --panel-border: #1c2126;
+  --accent-cyan: #22d3ee;
+  --on-cyan: #03141a;
+  --accent-white: #f8fafc;
+  --state-warning: #fb7185;
+  --state-success: #4ade80;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+}
+
+/* A single flat color, deliberately NOT a gradient. Two earlier attempts at a vignette
+   (a big percentage-of-farthest-corner one, then a smaller fixed-size one) both still
+   left a visible seam somewhere -- a gradient's whole point is varying color, so any part
+   of the page whose local shade doesn't happen to match a neighboring flat-colored
+   element (the 3D canvas's own solid fill, or NavBar's solid `bg-[#05070d]`) reads as a
+   seam. This exact value is shared with both of those: NavBar.tsx's sticky header and
+   Scene.tsx's `<color attach="background">`. One flat color everywhere is the only way to
+   guarantee zero visible boundary between them, at any scroll position or page length. */
+body {
+  background: #05070d;
+  color: var(--foreground);
+  font-family: var(--font-body), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.35);
+}
+
+.panel {
+  background: rgba(17, 21, 26, 0.75);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(6px);
+  /* Every usage pairs this with a Tailwind rounded-* class -- border-radius alone doesn't
+     clip children, so any content that overflows a panel (e.g. a scrollable list whose
+     items briefly exceed max-height before the internal scrollbar kicks in) bleeds past
+     the rounded corners as a visible rectangle instead of being contained by the shape. */
+  overflow: hidden;
+}
+
+.glow-text-cyan {
+  text-shadow: 0 0 18px rgba(34, 211, 238, 0.55);
+}
+
+.glow-text-warning {
+  text-shadow: 0 0 18px rgba(251, 113, 133, 0.55);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}

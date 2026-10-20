@@ -43,29 +43,49 @@ The intended implementation stack is:
 - Hero 3D concept: [assets/images/hero-cup-concept.png](./assets/images/hero-cup-concept.png)
 - Verification screenshots: [output/playwright](./output/playwright)
 
-## Contracts (v1.0.1)
-
-`contracts/` holds the onchain game, built on Fhenix CoFHE 1.0.
+## Live (v1.0.1, CoFHE 1.0)
 
 | | |
 |---|---|
+| Site | https://fhe-liars-dice.vercel.app |
 | Network | Arbitrum Sepolia (421614) |
-| LiarsDice | [`0xd24ED945Cf9DD0fb0F5499f61d39021823Cf5BF6`](https://sepolia.arbiscan.io/address/0xd24ED945Cf9DD0fb0F5499f61d39021823Cf5BF6) |
-| `@cofhe/sdk` / `@cofhe/hardhat-plugin` | 1.0.1 |
-| `@fhenixprotocol/cofhe-contracts` | 1.0.1 (1.0.2 only adds access-list helpers that the 1.0.1 mocks can't compile against) |
+| FheLiarsDice | [`0x645761Fd1b8fB752f7Bc7C0AB16b5Da3305b8F76`](https://repo.sourcify.dev/421614/0x645761Fd1b8fB752f7Bc7C0AB16b5Da3305b8F76) (Sourcify exact match) |
+| Previous deployment | `0x20B850b6ddCF9dC4E6cf6a403B27d962B3B9F9Da` (CoFHE 0.x, source in `legacy-contract/`) |
+| `@cofhe/sdk` / `@cofhe/react` / `@cofhe/hardhat-plugin` | 1.0.1 |
+| `@fhenixprotocol/cofhe-contracts` | 1.0.1 (1.0.2 only adds access-list helpers that `@cofhe/mock-contracts@1.0.1` can't compile against) |
 
-Flow: `createRoom` → `joinRoom` → `startGame` → each player `rollDice` (5 encrypted random faces, decryptable only by the owner) → `placeBid` → `challenge` (encrypted count of matches plus wild ones, only the boolean verdict is made public) → `resolveChallenge(roomId, result, signature)` with the threshold-network result from `client.decryptForTx(verdictHandle).withoutACP().execute()`. Eliminated hands and the winner's hand are revealed.
+## Layout
+
+- `contracts/` - Hardhat + `@cofhe/hardhat-plugin`. `FheLiarsDice.sol`, tests, deploy / legacy-sync / live smoke scripts.
+- `frontend/` - Next.js app (Privy + wagmi + `@cofhe/react`, Three.js table). Deployed to Vercel.
+- `legacy-contract/` - verified source of the previous deployment, for reference.
+
+## Points & leaderboard
+
+- The last player standing at a table earns 1 point (`PointsAwarded`). `getPoints(address)` returns a player's total.
+- `getLeaderboard()` returns the top 50 scorers, kept sorted on-chain on every win, so it costs the same no matter how many people play. The old `getAllPlayerPoints()` returned every player ever (130k+) and timed out, which left the site's leaderboard empty; it's still there for compatibility, next to the paginated `getPlayerPoints(offset, limit)`.
+- Points from the previous deployment carry over without trusting anyone: the new contract reads `getPoints` from the old one on-chain. `getPoints` includes unsynced legacy points, players are synced automatically when they join a table, and `syncLegacyPoints(address[])` (permissionless, idempotent) imported all 551 legacy winners at launch.
+
+## Game flow
+
+`createTable(maxPlayers)` -> `joinTable` -> `startGame` (rolls encrypted hands; each die is decryptable only by its owner) -> `placeBid` -> `challenge` (encrypted count of matches plus wild ones; only the boolean verdict is made public) -> `finalizeChallenge(tableId, verdict, signature)` -> `finalizeReveal(tableId, dice, signatures)`, using the Threshold Network results from `client.decryptForTx(handle).withoutACP().execute()`.
+
+## Develop
 
 ```bash
 cd contracts
 npm install
-npm test                      # mock CoFHE tests
-npm run deploy:arb-sepolia    # needs PRIVATE_KEY in contracts/.env
-npm run smoke:arb-sepolia     # live 2-player round against real CoFHE
+npm test                         # 20 tests against CoFHE mocks
+npm run deploy:arb-sepolia       # PRIVATE_KEY in contracts/.env
+npm run sync-legacy:arb-sepolia  # import legacy points (safe to re-run)
+npm run smoke:arb-sepolia        # full live game against real CoFHE
+
+cd ../frontend
+npm install
+npm run dev                      # NEXT_PUBLIC_PRIVY_APP_ID + NEXT_PUBLIC_FHE_LIARS_DICE_ADDRESS in .env.local
 ```
 
-Known limitation: faces come from `random % 6 + 1` on a uint8, so faces 1-4 are very slightly more likely than 5-6. Fine for casual mode.
-
-## Notes
-
-The frontend (3D table, wagmi/viem, `@cofhe/react`) is not built yet.
+Known limitations:
+- Faces come from `random % 6 + 1` on a uint8, so 1-4 are ~0.4% more likely than 5-6.
+- A player can farm points by playing against their own second wallet.
+- There are no turn timers, so a player who leaves mid-game stalls the table (casual mode by design).

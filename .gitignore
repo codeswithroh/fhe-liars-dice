@@ -11,3 +11,6 @@ coverage/
 artifacts/
 cache/
 typechain-types/
+.next/
+*.tsbuildinfo
+.vercel/
