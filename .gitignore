@@ -8,3 +8,6 @@ build/
 coverage/
 .cache/
 *.log
+artifacts/
+cache/
+typechain-types/

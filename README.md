@@ -43,6 +43,29 @@ The intended implementation stack is:
 - Hero 3D concept: [assets/images/hero-cup-concept.png](./assets/images/hero-cup-concept.png)
 - Verification screenshots: [output/playwright](./output/playwright)
 
+## Contracts (v1.0.1)
+
+`contracts/` holds the onchain game, built on Fhenix CoFHE 1.0.
+
+| | |
+|---|---|
+| Network | Arbitrum Sepolia (421614) |
+| LiarsDice | [`0xd24ED945Cf9DD0fb0F5499f61d39021823Cf5BF6`](https://sepolia.arbiscan.io/address/0xd24ED945Cf9DD0fb0F5499f61d39021823Cf5BF6) |
+| `@cofhe/sdk` / `@cofhe/hardhat-plugin` | 1.0.1 |
+| `@fhenixprotocol/cofhe-contracts` | 1.0.1 (1.0.2 only adds access-list helpers that the 1.0.1 mocks can't compile against) |
+
+Flow: `createRoom` → `joinRoom` → `startGame` → each player `rollDice` (5 encrypted random faces, decryptable only by the owner) → `placeBid` → `challenge` (encrypted count of matches plus wild ones, only the boolean verdict is made public) → `resolveChallenge(roomId, result, signature)` with the threshold-network result from `client.decryptForTx(verdictHandle).withoutACP().execute()`. Eliminated hands and the winner's hand are revealed.
+
+```bash
+cd contracts
+npm install
+npm test                      # mock CoFHE tests
+npm run deploy:arb-sepolia    # needs PRIVATE_KEY in contracts/.env
+npm run smoke:arb-sepolia     # live 2-player round against real CoFHE
+```
+
+Known limitation: faces come from `random % 6 + 1` on a uint8, so faces 1-4 are very slightly more likely than 5-6. Fine for casual mode.
+
 ## Notes
 
-This repo currently contains the overview/spec artifact, not the playable game implementation yet.
+The frontend (3D table, wagmi/viem, `@cofhe/react`) is not built yet.
