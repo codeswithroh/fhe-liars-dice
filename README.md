@@ -1,6 +1,6 @@
 # FHE Liar's Dice
 
-A planning and visual overview for a casual-first privacy game built for Fhenix CoFHE on Arbitrum Sepolia.
+A casual-first privacy game built on Fhenix CoFHE on Arbitrum Sepolia: contracts, the Next.js frontend, and the original overview page (`index.html`).
 
 The core mechanic: every player's dice roll is generated as encrypted onchain state. Players make public escalating bids about the total dice on the table. When someone calls a bluff, the contract counts matching dice across encrypted hands, including wild ones, and reveals only whether the bid was good or a lie. Hands stay sealed during active play, then reveal after elimination.
 
